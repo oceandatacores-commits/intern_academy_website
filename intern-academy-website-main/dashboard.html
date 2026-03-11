@@ -258,10 +258,14 @@
         </div>
     </footer>
 
-    <script src="app.js"></script>
+    <!-- 1. Supabase CDN library MUST be first so createClient() is available -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <!-- 2. Config initializes the Supabase client (calls createClient) -->
     <script src="supabase-config.js"></script>
+    <!-- 3. Auth helpers depend on the initialized client -->
     <script src="auth.js"></script>
+    <!-- 4. General app utilities -->
+    <script src="app.js"></script>
 
     <script>
         let currentUser = null;
@@ -283,7 +287,7 @@
                 document.getElementById('userEmail').textContent = currentUser.email;
 
                 // Load user profile from student_registrations
-                const { data: profile, error } = await supabase
+                const { data: profile, error } = await window.supabaseClient
                     .from('student_registrations')
                     .select('*')
                     .eq('user_id', currentUser.id)
@@ -490,7 +494,7 @@
         }
 
         async function loadApplications() {
-            const { data: applications, error: appsError } = await supabase
+            const { data: applications, error: appsError } = await window.supabaseClient
                 .from('internship_applications')
                 .select('*')
                 .eq('user_id', currentUser.id)
@@ -547,7 +551,7 @@
 
         async function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
-                const { error } = await supabase.auth.signOut();
+                const { error } = await window.supabaseClient.auth.signOut();
                 if (error) {
                     alert('Error logging out: ' + error.message);
                 } else {

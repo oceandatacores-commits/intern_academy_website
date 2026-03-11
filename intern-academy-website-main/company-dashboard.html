@@ -307,10 +307,14 @@
         </div>
     </footer>
 
-    <script src="app.js"></script>
+    <!-- 1. Supabase CDN library MUST be first so createClient() is available -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <!-- 2. Config initializes the Supabase client (calls createClient) -->
     <script src="supabase-config.js"></script>
+    <!-- 3. Auth helpers depend on the initialized client -->
     <script src="auth.js"></script>
+    <!-- 4. General app utilities -->
+    <script src="app.js"></script>
 
     <script>
         let currentCompany = null;
@@ -328,7 +332,7 @@
                 currentUser = session.user;
 
                 // Load company profile using user_id first
-                let { data: company, error: companyError } = await supabase
+                let { data: company, error: companyError } = await window.supabaseClient
                     .from('company_registrations')
                     .select('*')
                     .eq('user_id', currentUser.id)
@@ -336,7 +340,7 @@
 
                 // Fallback to email if user_id not found (migration support)
                 if (!company) {
-                    const { data: companyByEmail } = await supabase
+                    const { data: companyByEmail } = await window.supabaseClient
                         .from('company_registrations')
                         .select('*')
                         .eq('email', currentUser.email)
@@ -495,7 +499,7 @@
 
         async function loadApplications() {
             try {
-                const { data: applications, error } = await supabase
+                const { data: applications, error } = await window.supabaseClient
                     .from('internship_applications')
                     .select('*')
                     .eq('company_name', currentCompany.company_name)
@@ -608,7 +612,7 @@
 
         async function updateApplicationStatus(applicationId, newStatus) {
             try {
-                const { error } = await supabase
+                const { error } = await window.supabaseClient
                     .from('internship_applications')
                     .update({ status: newStatus })
                     .eq('id', applicationId);
@@ -643,7 +647,7 @@
 
         async function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
-                const { error } = await supabase.auth.signOut();
+                const { error } = await window.supabaseClient.auth.signOut();
                 if (error) {
                     alert('Error logging out: ' + error.message);
                 } else {

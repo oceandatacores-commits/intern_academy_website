@@ -156,11 +156,14 @@
         </div>
     </footer>
 
-    <script src="app.js"></script>
-    <!-- Supabase JavaScript Client -->
+    <!-- 1. Supabase CDN library MUST be first so createClient() is available -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <!-- 2. Config initializes the Supabase client (calls createClient) -->
     <script src="supabase-config.js"></script>
+    <!-- 3. Auth helpers depend on the initialized client -->
     <script src="auth.js"></script>
+    <!-- 4. General app utilities -->
+    <script src="app.js"></script>
 </body>
 
 </html>

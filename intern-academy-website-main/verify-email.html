@@ -127,7 +127,7 @@
             btn.disabled = true;
 
             try {
-                const { data, error } = await supabase.auth.resend({
+                const { data, error } = await window.supabaseClient.auth.resend({
                     type: 'signup',
                     email: userEmail
                 });
