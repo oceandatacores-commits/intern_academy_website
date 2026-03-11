@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Intern Academy</title>
     <meta name="description" content="Log in to your Intern Academy account to access internships, courses, and more.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -119,15 +121,19 @@
     <footer>
         <div class="container">
             <div class="footer-bottom">
-                <p>&copy; 2024 Intern Academy. All rights reserved.</p>
+                <p>&copy; <span class="copyright-year"></span> Intern Academy. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <script src="app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 1. Supabase CDN library MUST be first so createClient() is available -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <!-- 2. Config initializes the Supabase client (calls createClient) -->
     <script src="supabase-config.js"></script>
+    <!-- 3. Auth helpers depend on the initialized client -->
     <script src="auth.js"></script>
+    <!-- 4. General app utilities -->
+    <script src="app.js"></script>
 
     <script>
         async function handleLogin(event) {
@@ -137,13 +143,20 @@
             const password = document.getElementById('password').value;
             const rememberMe = document.getElementById('rememberMe').checked;
 
+            // Guard: ensure Supabase client is initialized
+            if (!window.supabaseClient) {
+                alert('❌ Connection error. Please refresh the page and try again.');
+                console.error('Supabase client not initialized');
+                return;
+            }
+
             const submitBtn = event.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
             submitBtn.disabled = true;
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await window.supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
                 });

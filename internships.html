@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find Internships | Intern Academy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -87,7 +89,8 @@
 <body>
     <nav class="navbar">
         <div class="container nav-container">
-            <a href="index.html" class="logo"><img src="assets/logo-full.png" alt="Intern Academy - A Launchpad to Real-World Skills" style="height: 120px; width: auto;"></a>
+            <a href="index.html" class="logo"><img src="assets/logo-full.png"
+                    alt="Intern Academy - A Launchpad to Real-World Skills" style="height: 120px; width: auto;"></a>
             <div class="nav-links">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="internships.html" class="nav-link" style="color: var(--accent);">Internships</a>
@@ -546,7 +549,8 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="index.html" class="logo" style="color: white;">
-                        <img src="assets/logo-full.png" alt="Intern Academy - A Launchpad to Real-World Skills" style="height: 120px; width: auto;">
+                        <img src="assets/logo-full.png" alt="Intern Academy - A Launchpad to Real-World Skills"
+                            style="height: 120px; width: auto;">
                     </a>
                     <p>Empowering the next generation of professionals across diverse industries through premium
                         local internships and world-class education.</p>
@@ -583,13 +587,13 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2024 Intern Academy. All rights reserved.</p>
+                <p>&copy; <span class="copyright-year"></span> Intern Academy. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="supabase-config.js"></script>
     <script src="auth.js"></script>
     <script src="app.js"></script>
@@ -910,7 +914,7 @@
 
                     // Try to fetch user profile to pre-fill phone
                     try {
-                        const { data: profile, error } = await supabase
+                        const { data: profile, error } = await window.supabaseClient
                             .from('student_registrations')
                             .select('phone, full_name')
                             .eq('user_id', session.user.id)
@@ -969,14 +973,14 @@
                     const fileExt = file.name.split('.').pop();
                     const fileName = `${userId}/${timestamp}_resume.${fileExt}`;
 
-                    const { data: uploadData, error: uploadError } = await supabase.storage
+                    const { data: uploadData, error: uploadError } = await window.supabaseClient.storage
                         .from('resumes')
                         .upload(fileName, file);
 
                     if (uploadError) throw uploadError;
 
                     // Get Public URL
-                    const { data: { publicUrl } } = supabase.storage
+                    const { data: { publicUrl } } = window.supabaseClient.storage
                         .from('resumes')
                         .getPublicUrl(fileName);
 
@@ -999,7 +1003,7 @@
                     status: 'pending'
                 };
 
-                const { data, error } = await supabase
+                const { data, error } = await window.supabaseClient
                     .from('internship_applications')
                     .insert([formData]);
 

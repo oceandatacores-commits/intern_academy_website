@@ -15,6 +15,9 @@
     --bg-body: #f8fafc;
     /* Slate 50 */
     --bg-card: #ffffff;
+    --bg-secondary: #f1f5f9;
+    --text-secondary: #64748b;
+    --gray-light: #e2e8f0;
     --success: #10b981;
     --danger: #ef4444;
 
