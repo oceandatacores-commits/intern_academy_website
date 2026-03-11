@@ -293,7 +293,42 @@
                     .eq('user_id', currentUser.id)
                     .single();
 
-                if (error) {
+                if (error && error.code === 'PGRST116') {
+                    // No profile row exists (e.g. Google OAuth first login)
+                    // Auto-create a minimal profile from auth metadata
+                    console.log('No profile found — creating one for first-time user');
+                    const meta = currentUser.user_metadata || {};
+                    const newProfile = {
+                        user_id: currentUser.id,
+                        full_name: meta.full_name || meta.name || currentUser.email.split('@')[0],
+                        email: currentUser.email,
+                        phone: meta.phone || '',
+                        college_name: '',
+                        graduation_year: null,
+                        field_of_study: '',
+                        skills: '',
+                        interests: ''
+                    };
+
+                    const { data: inserted, error: insertErr } = await window.supabaseClient
+                        .from('student_registrations')
+                        .insert([newProfile])
+                        .select()
+                        .single();
+
+                    if (insertErr) {
+                        console.error('Error creating profile:', insertErr);
+                        document.getElementById('loadingProfile').innerHTML = `
+                            <p style="color: #dc3545;">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Could not create profile. Please try again.
+                            </p>
+                        `;
+                    } else {
+                        userProfile = inserted;
+                        renderProfileView(inserted);
+                    }
+                } else if (error) {
                     console.error('Error loading profile:', error);
                     document.getElementById('loadingProfile').innerHTML = `
                         <p style="color: #dc3545;">
