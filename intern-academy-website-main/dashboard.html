@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Intern Academy</title>
     <meta name="description" content="Your Intern Academy student dashboard">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -251,13 +253,13 @@
     <footer>
         <div class="container">
             <div class="footer-bottom">
-                <p>&copy; 2024 Intern Academy. All rights reserved.</p>
+                <p>&copy; <span class="copyright-year"></span> Intern Academy. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script src="app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="supabase-config.js"></script>
     <script src="auth.js"></script>
 
@@ -311,7 +313,6 @@
 
         function renderProfileView(profile) {
             document.getElementById('loadingProfile').style.display = 'none';
-            document.getElementById('profileInfo').style.display = 'grid'; // Ensure grid layout
             document.getElementById('profileView').innerHTML = `
                 <div>
                     <label style="color: var(--text-secondary); font-size: 0.9rem;">Full Name</label>

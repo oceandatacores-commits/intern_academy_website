@@ -7,7 +7,7 @@
  * Check if user is authenticated
  */
 async function checkAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
     return session;
 }
 
@@ -15,7 +15,7 @@ async function checkAuth() {
  * Get current user
  */
 async function getCurrentUser() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await window.supabaseClient.auth.getUser();
     return user;
 }
 
@@ -24,7 +24,7 @@ async function getCurrentUser() {
  */
 async function signUpUser(email, password, metadata = {}) {
     try {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await window.supabaseClient.auth.signUp({
             email: email,
             password: password,
             options: {
@@ -46,7 +46,7 @@ async function signUpUser(email, password, metadata = {}) {
  */
 async function signInUser(email, password) {
     try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await window.supabaseClient.auth.signInWithPassword({
             email: email,
             password: password
         });
@@ -64,7 +64,7 @@ async function signInUser(email, password) {
  */
 async function signOutUser() {
     try {
-        const { error } = await supabase.auth.signOut();
+        const { error } = await window.supabaseClient.auth.signOut();
         if (error) throw error;
         window.location.href = 'index.html';
         return { success: true };
@@ -79,7 +79,7 @@ async function signOutUser() {
  */
 async function sendPasswordResetEmail(email) {
     try {
-        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        const { data, error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: `${window.location.origin}/reset-password.html`
         });
 
@@ -96,7 +96,7 @@ async function sendPasswordResetEmail(email) {
  */
 async function updatePassword(newPassword) {
     try {
-        const { data, error } = await supabase.auth.updateUser({
+        const { data, error } = await window.supabaseClient.auth.updateUser({
             password: newPassword
         });
 
@@ -113,7 +113,7 @@ async function updatePassword(newPassword) {
  */
 async function resendVerificationEmail(email) {
     try {
-        const { data, error } = await supabase.auth.resend({
+        const { data, error } = await window.supabaseClient.auth.resend({
             type: 'signup',
             email: email
         });
@@ -131,7 +131,7 @@ async function resendVerificationEmail(email) {
  */
 async function verifyOTP(email, token, type = 'email') {
     try {
-        const { data, error } = await supabase.auth.verifyOtp({
+        const { data, error } = await window.supabaseClient.auth.verifyOtp({
             email: email,
             token: token,
             type: type
@@ -163,7 +163,7 @@ async function protectPage() {
  */
 async function updateUserProfile(userId, profileData) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('student_registrations')
             .update({
                 ...profileData,
@@ -185,7 +185,7 @@ async function updateUserProfile(userId, profileData) {
  */
 async function getUserProfile(userId) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('student_registrations')
             .select('*')
             .eq('user_id', userId)
@@ -203,7 +203,7 @@ async function getUserProfile(userId) {
  * Listen to auth state changes
  */
 function onAuthStateChange(callback) {
-    return supabase.auth.onAuthStateChange((event, session) => {
+    return window.supabaseClient.auth.onAuthStateChange((event, session) => {
         callback(event, session);
     });
 }
@@ -213,7 +213,7 @@ function onAuthStateChange(callback) {
  */
 async function updateCompanyProfile(userId, companyData) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('company_registrations')
             .update({
                 ...companyData,
@@ -236,7 +236,7 @@ async function updateCompanyProfile(userId, companyData) {
  */
 async function getCompanyProfile(userId) {
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('company_registrations')
             .select('*')
             .eq('user_id', userId)
@@ -255,7 +255,7 @@ async function getCompanyProfile(userId) {
  */
 async function changeUserPassword(newPassword) {
     try {
-        const { data, error } = await supabase.auth.updateUser({
+        const { data, error } = await window.supabaseClient.auth.updateUser({
             password: newPassword
         });
 
@@ -301,7 +301,7 @@ async function updateNavbarAuth() {
  */
 async function signInWithGoogle() {
     try {
-        const { data, error } = await supabase.auth.signInWithOAuth({
+        const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
             provider: 'google',
             options: {
                 redirectTo: `${window.location.origin}/dashboard.html`,
@@ -333,7 +333,7 @@ async function handleGoogleSignIn() {
 
 // Initialize auth state in navbar on page load
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof supabase !== 'undefined') {
+    if (window.supabaseClient) {
         updateNavbarAuth();
     }
 });

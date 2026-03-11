@@ -1,16 +1,23 @@
 // Supabase Configuration for Intern Academy
-// Replace these with your actual Supabase project credentials
+// Project: https://utwdwlnvempgfrfocrps.supabase.co
 
-const SUPABASE_URL = 'https://wzeiioymnkunimumvuvr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6ZWlpb3ltbmt1bmltdW12dXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzNTE3NzQsImV4cCI6MjA3OTkyNzc3NH0.9_QMGXubInEviW6JGvU4S75otzuPLyQ3uWoZ47TF8w8';
+const SUPABASE_URL = 'https://utwdwlnvempgfrfocrps.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0d2R3bG52ZW1wZ2ZyZm9jcnBzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5ODQ2OTgsImV4cCI6MjA4ODU2MDY5OH0._AxIYZnLYIpUuaBQkfIbSlNWjFgrqbgE6unVpR6FWu4';
 
 // Initialize Supabase client
-let supabase;
+// The Supabase CDN exposes its library namespace on window.supabase.
+// We call createClient() to produce the actual *client* object and store
+// it on window.supabaseClient so the two don't get confused.
+window.supabaseClient = null;
 
 // Function to initialize Supabase when library is loaded
 function initializeSupabase() {
-    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // The CDN UMD build exposes the library as window.supabase with a createClient method
+    const supabaseLib = window.supabase;
+    if (supabaseLib && typeof supabaseLib.createClient === 'function') {
+        window.supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Overwrite window.supabase with the client so bare `supabase` references work
+        window.supabase = window.supabaseClient;
         console.log('✅ Supabase client initialized successfully');
         return true;
     } else {
@@ -19,13 +26,13 @@ function initializeSupabase() {
     }
 }
 
-// Try to initialize immediately
+// Try to initialize immediately (works when script order is correct)
 if (!initializeSupabase()) {
-    // If not loaded, wait for window load event
+    // Fallback: wait for page load + small delay
     window.addEventListener('load', () => {
         setTimeout(() => {
             if (!initializeSupabase()) {
-                console.error('❌ Failed to initialize Supabase client. Make sure the Supabase library script is loaded before this file.');
+                console.error('❌ Failed to initialize Supabase client. The Supabase CDN script must be loaded before supabase-config.js.');
             }
         }, 100);
     });
@@ -40,7 +47,7 @@ async function handleStudentRegistration(event) {
     event.preventDefault();
 
     // Check if Supabase is initialized
-    if (!supabase) {
+    if (!window.supabaseClient) {
         alert('❌ Connection error. Please refresh the page and try again.');
         console.error('Supabase client not initialized');
         return;
@@ -72,7 +79,7 @@ async function handleStudentRegistration(event) {
 
     try {
         // Step 1: Sign up user with Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const { data: authData, error: authError } = await window.supabaseClient.auth.signUp({
             email: email,
             password: password,
             options: {
@@ -87,7 +94,7 @@ async function handleStudentRegistration(event) {
         if (authError) throw authError;
 
         // Step 2: Save additional profile data to student_registrations table
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileData, error: profileError } = await window.supabaseClient
             .from('student_registrations')
             .insert([{
                 user_id: authData.user.id,
@@ -146,7 +153,7 @@ async function handleStudentRegistration(event) {
             alert(`❌ Registration failed. Please try again or contact support.\n\nError Code: ${error.code || 'NETWORK_ERROR'}\nError: ${error.message || 'Unknown error'}\n\nContact: contact@internacademy.co.in`);
         }
     } finally {
-        submitBtn.textContent = originalText;
+        submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
     }
 }
@@ -158,7 +165,7 @@ async function handleCompanyRegistration(event) {
     event.preventDefault();
 
     // Check if Supabase is initialized
-    if (!supabase) {
+    if (!window.supabaseClient) {
         alert('❌ Connection error. Please refresh the page and try again.');
         console.error('Supabase client not initialized');
         return;
@@ -181,7 +188,7 @@ async function handleCompanyRegistration(event) {
     };
 
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('company_registrations')
             .insert([formData])
             .select();
@@ -212,7 +219,7 @@ async function handleContactForm(event) {
     event.preventDefault();
 
     // Check if Supabase is initialized
-    if (!supabase) {
+    if (!window.supabaseClient) {
         alert('❌ Connection error. Please refresh the page and try again.');
         console.error('Supabase client not initialized');
         return;
@@ -232,7 +239,7 @@ async function handleContactForm(event) {
     };
 
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('contact_messages')
             .insert([formData])
             .select();
@@ -261,7 +268,7 @@ async function subscribeToNewsletter(email) {
     }
 
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('newsletter_subscriptions')
             .insert([{ email: email.trim().toLowerCase() }])
             .select();
@@ -306,7 +313,7 @@ async function handleInternshipApplication(event) {
     };
 
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('internship_applications')
             .insert([formData])
             .select();
@@ -348,7 +355,7 @@ async function handleCourseEnrollment(event) {
     };
 
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('course_enrollments')
             .insert([formData])
             .select();

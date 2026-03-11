@@ -1,24 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Mobile Menu Toggle
+    // Mobile Menu Toggle — target ALL .nav-links sections (page links + auth buttons)
     const mobileToggle = document.querySelector('.mobile-toggle');
-    const navLinks = document.querySelector('.nav-links');
+    const navLinks = document.querySelectorAll('.nav-links');
 
     if (mobileToggle) {
         mobileToggle.addEventListener('click', () => {
-            if (navLinks.style.display === 'flex') {
-                navLinks.style.display = 'none';
-            } else {
-                navLinks.style.display = 'flex';
-                navLinks.style.flexDirection = 'column';
-                navLinks.style.position = 'absolute';
-                navLinks.style.top = '80px';
-                navLinks.style.left = '0';
-                navLinks.style.width = '100%';
-                navLinks.style.background = 'white';
-                navLinks.style.padding = '1rem';
-                navLinks.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-                navLinks.style.zIndex = '1000';
-            }
+            navLinks.forEach(nav => {
+                if (nav.style.display === 'flex') {
+                    nav.style.display = 'none';
+                } else {
+                    nav.style.display = 'flex';
+                    nav.style.flexDirection = 'column';
+                    nav.style.position = 'absolute';
+                    nav.style.top = '80px';
+                    nav.style.left = '0';
+                    nav.style.width = '100%';
+                    nav.style.background = 'white';
+                    nav.style.padding = '1rem';
+                    nav.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+                    nav.style.zIndex = '1000';
+                }
+            });
         });
     }
 
@@ -49,5 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.fade-in').forEach(el => {
         observer.observe(el);
+    });
+
+    // Auto-update copyright year
+    document.querySelectorAll('.copyright-year').forEach(el => {
+        el.textContent = new Date().getFullYear();
     });
 });
